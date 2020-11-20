@@ -1,0 +1,270 @@
+{
+	"info": {
+		"_postman_id": "63df3f28-b4ca-4524-a6ce-de1b1ffc751a",
+		"name": "PollAPI - Gustavo Bilert",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Create a poll",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "3f4343fb-5e3b-4f0a-ac40-8b6d7374d15b",
+						"exec": [
+							"pm.test(\"Id is not null\", function () {\r",
+							"    var jsonData = pm.response.json();\r",
+							"    pm.expect(jsonData.id).to.not.be.null;\r",
+							"    pm.globals.set(\"poll_id\", jsonData.id);\r",
+							"});\r",
+							"\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"description\": \"Gostaria de aprovar o candidato Gustavo Bilert para fazer parte de sua equipe?\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "localhost:8080/polls",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"polls"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Check poll was created",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "localhost:8080/polls/{{poll_id}}",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"polls",
+						"{{poll_id}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "List all polls",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "1894d3f6-4d26-43bd-b414-741f7e4197ca",
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "localhost:8080/polls",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"polls"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Start the poll",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"duration\": 30\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "localhost:8080/polls/{{poll_id}}/start",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"polls",
+						"{{poll_id}}",
+						"start"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Place vote",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "dadd629e-8dda-476a-892b-00c330d4f51b",
+						"exec": [
+							"function cpf() {\r",
+							"  const rnd = (n) => Math.round(Math.random() * n);\r",
+							"  const mod = (base, div) => Math.round(base - Math.floor(base / div) * div)\r",
+							"  const n = Array(9).fill('').map(() => rnd(9));\r",
+							"\r",
+							"  let d1 = n.reduce((total, number, index) => (total + (number * (10 - index))), 0)\r",
+							"  d1 = 11 - mod(d1, 11);\r",
+							"  if (d1 >= 10) d1 = 0;\r",
+							"  \r",
+							"  let d2 = (d1 * 2) + n.reduce((total, number, index) => (total + (number * (11 - index))), 0)\r",
+							"  d2 = 11 - mod(d2, 11);\r",
+							"  if (d2 >= 10) d2 = 0;\r",
+							"\r",
+							"  return `${n.join('')}${d1}${d2}`\r",
+							"}\r",
+							"\r",
+							"pm.globals.set('cpf', cpf());"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"externalVoterIdentifier\": \"external-{{cpf}}\",\r\n    \"vote\": true\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "localhost:8080/polls/{{poll_id}}/vote-by-cpf/{{cpf}}",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"polls",
+						"{{poll_id}}",
+						"vote-by-cpf",
+						"{{cpf}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Place another vote",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "241a7ea4-2fa9-46de-81c3-72cc1c3ba3b8",
+						"exec": [
+							"function cpf() {\r",
+							"  const rnd = (n) => Math.round(Math.random() * n);\r",
+							"  const mod = (base, div) => Math.round(base - Math.floor(base / div) * div)\r",
+							"  const n = Array(9).fill('').map(() => rnd(9));\r",
+							"\r",
+							"  let d1 = n.reduce((total, number, index) => (total + (number * (10 - index))), 0)\r",
+							"  d1 = 11 - mod(d1, 11);\r",
+							"  if (d1 >= 10) d1 = 0;\r",
+							"  \r",
+							"  let d2 = (d1 * 2) + n.reduce((total, number, index) => (total + (number * (11 - index))), 0)\r",
+							"  d2 = 11 - mod(d2, 11);\r",
+							"  if (d2 >= 10) d2 = 0;\r",
+							"\r",
+							"  return `${n.join('')}${d1}${d2}`\r",
+							"}\r",
+							"\r",
+							"pm.globals.set('cpf', cpf());"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"externalVoterIdentifier\": \"external-{{cpf}}\",\r\n    \"vote\": true\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "localhost:8080/polls/{{poll_id}}/vote-by-cpf/{{cpf}}",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"polls",
+						"{{poll_id}}",
+						"vote-by-cpf",
+						"{{cpf}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get poll result",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "localhost:8080/polls/{{poll_id}}",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"polls",
+						"{{poll_id}}"
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"protocolProfileBehavior": {}
+}
