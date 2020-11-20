@@ -1,0 +1,206 @@
+{
+	"info": {
+		"_postman_id": "a328a1ac-208c-41e3-81fa-a2feb9842b39",
+		"name": "PollAPIPerformance - Gustavo Bilert",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Create a poll",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "6583bdd7-8e8b-4363-ab4e-364341ffc322",
+						"exec": [
+							"pm.test(\"Id is not null\", function () {\r",
+							"    var jsonData = pm.response.json();\r",
+							"    pm.expect(jsonData.id).to.not.be.null;\r",
+							"    pm.globals.set(\"poll_id\", jsonData.id);\r",
+							"});\r",
+							"\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"description\": \"Gostaria de aprovar o candidato Gustavo Bilert para fazer parte de sua equipe?\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "localhost:8080/polls",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"polls"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Start the poll",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"duration\": 600\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "localhost:8080/polls/{{poll_id}}/start",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"polls",
+						"{{poll_id}}",
+						"start"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Place vote",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "7d8840c0-6b2a-40d6-8f85-4ea91368c140",
+						"exec": [
+							""
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"id": "7e191a41-8a75-48e9-bf6d-bfdddc38e23e",
+						"exec": [
+							"//100 ms is a maximum allowed value according to requirements \r",
+							"maximumResponseTime = 100;\r",
+							"//1000 is a number of sent requests according to requirements \r",
+							"iterations = 1000;\r",
+							"//1 ms is a delay between requests according to requirements \r",
+							"delay = 1;\r",
+							"//responseTimes is an array for collecting response time values\r",
+							"responseTimes = [];\r",
+							"i=0;\r",
+							"function sendRequest() {\r",
+							"    pm.globals.set('cpf', cpf());\r",
+							"    pm.sendRequest({\r",
+							"        url: pm.variables.replaceIn(\"localhost:8080/polls/{{poll_id}}/vote-by-cpf/{{cpf}}\"),\r",
+							"        method: 'POST',\r",
+							"        header: {\r",
+							"            'Content-Type': 'application/json'\r",
+							"        },\r",
+							"        body: {\r",
+							"            mode: 'raw',\r",
+							"            raw: JSON.stringify({ vote: true })\r",
+							"        }\r",
+							"    }, function (err, res) {\r",
+							"        pm.test(\"Response time is \" + res.responseTime, function (){\r",
+							"        pm.expect(err).to.equal(null);\r",
+							"        pm.expect(res.code).to.be.oneOf([200, 403])\r",
+							"        responseTimes.push(res.responseTime);\r",
+							"        });\r",
+							"        if (i < iterations - 1) {\r",
+							"            i++;\r",
+							"            setTimeout(sendRequest, delay);\r",
+							"        } \r",
+							"        else {\r",
+							"            percentile90ResponseTime = quantile(responseTimes, 90);\r",
+							"            pm.test(\"90 percentile response time \" + percentile90ResponseTime + \" is lower than \" + maximumResponseTime + \", the number of iterations is \" + iterations, function () {\r",
+							"                pm.expect(percentile90ResponseTime).to.be.below(maximumResponseTime);\r",
+							"            });\r",
+							"        }\r",
+							"    });\r",
+							"}\r",
+							"sendRequest();\r",
+							"\r",
+							"function sortNumber(a,b) {\r",
+							"    return a - b;\r",
+							"}\r",
+							"function quantile(array, percentile) {\r",
+							"    array.sort(sortNumber);\r",
+							"    index = percentile/100. * (array.length-1);\r",
+							"    if (Math.floor(index) == index) {\r",
+							"     result = array[index];\r",
+							"    } else {\r",
+							"        j = Math.floor(index)\r",
+							"        fraction = index - j;\r",
+							"        result = array[j] + (array[j+1] - array[j]) * fraction;\r",
+							"    }\r",
+							"    return result;\r",
+							"}\r",
+							"function cpf() {\r",
+							"  const rnd = (n) => Math.round(Math.random() * n);\r",
+							"  const mod = (base, div) => Math.round(base - Math.floor(base / div) * div)\r",
+							"  const n = Array(9).fill('').map(() => rnd(9));\r",
+							"\r",
+							"  let d1 = n.reduce((total, number, index) => (total + (number * (10 - index))), 0)\r",
+							"  d1 = 11 - mod(d1, 11);\r",
+							"  if (d1 >= 10) d1 = 0;\r",
+							"  \r",
+							"  let d2 = (d1 * 2) + n.reduce((total, number, index) => (total + (number * (11 - index))), 0)\r",
+							"  d2 = 11 - mod(d2, 11);\r",
+							"  if (d2 >= 10) d2 = 0;\r",
+							"\r",
+							"  return `${n.join('')}${d1}${d2}`\r",
+							"}"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"externalVoterIdentifier\": \"external-{{cpf}}\",\r\n    \"vote\": true\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "localhost:8080/polls/{{poll_id}}/vote-by-cpf/{{cpf}}",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"polls",
+						"{{poll_id}}",
+						"vote-by-cpf",
+						"{{cpf}}"
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"protocolProfileBehavior": {}
+}
