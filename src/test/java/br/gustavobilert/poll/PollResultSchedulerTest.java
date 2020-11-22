@@ -63,6 +63,7 @@ public class PollResultSchedulerTest {
     private void placeVote(Poll poll, boolean inFavor) {
         Vote vote = new Vote();
         vote.setPoll(poll);
+        vote.setCpf(TestUtils.generateCpf());
         vote.setVote(inFavor);
         voteRepository.persist(vote);
     }

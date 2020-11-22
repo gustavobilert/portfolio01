@@ -325,11 +325,12 @@ public class PollResourceTest {
         return given()
                 .contentType(ContentType.JSON)
                 .pathParam("id", id)
-                .pathParam("cpf", cpf)
-                .body(new JsonObject().put("vote", vote)
+                .body(new JsonObject()
+                        .put("cpf", cpf)
+                        .put("vote", vote)
                         .put("externalVoterIdentifier", externalVoterIdentifier).toString())
                 .when()
-                .post("/polls/{id}/vote-by-cpf/{cpf}");
+                .post("/polls/{id}/vote");
     }
 
     @Test
@@ -339,10 +340,12 @@ public class PollResourceTest {
         given()
                 .contentType(ContentType.JSON)
                 .pathParam("id", Long.MAX_VALUE)
-                .pathParam("cpf", cpf)
-                .body(new JsonObject().put("vote", true).toString())
+                .body(new JsonObject()
+                        .put("cpf", cpf)
+                        .put("vote", true)
+                        .toString())
                 .when()
-                .post("/polls/{id}/vote-by-cpf/{cpf}")
+                .post("/polls/{id}/vote")
                 .then()
                 .statusCode(404)
                 .body("message", is("The following resource was not found: Poll with id = "+Long.MAX_VALUE));

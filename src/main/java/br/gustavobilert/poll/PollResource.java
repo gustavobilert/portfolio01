@@ -68,22 +68,18 @@ public class PollResource {
 
     /**
      * Places a vote on the poll based on the voter's CPF (brazilian registration of individuals).
-     * CPF is not the ideal identifier for the voters, since it may prevent foreign people from voting and is vulnerable to legislation changes.
-     * We adopted it to maintain consistency with the external system, that uses it to identify the voter,
-     * and because it is specified that our API should return an error 404 (Not Found) when the CPF is invalid,
-     * in this case the resource that was not found is the CPF, so the resource URI must include it to be consistent.
-     *  @param pollId Id of the poll
-     * @param cpf CPF of the voter
+     * CPF is not the ideal identifier for the voters, since it may prevent foreign people from voting
+     * and is vulnerable to legislation changes. But other voter identifiers could be added in the future.
+     * @param pollId Id of the poll
      * @return The registered vote
      */
-    @Operation(summary = "Votar por CPF",
+    @Operation(summary = "Votar",
     description = "Registra um voto com base no CPF do cooperado, desde que o CPF esteja liberado para votar," +
             " conforme informação obtida a partir de outro sistema (sistema externo)")
     @POST
-    @Path("{id}/vote-by-cpf/{cpf}")
-    public Vote voteByCpf(@PathParam("id") Long pollId, @PathParam("cpf") String cpf, @NotNull Vote vote){
-        vote.setCpf(cpf);
-        return pollService.voteByCpf(pollId, vote);
+    @Path("{id}/vote")
+    public Vote vote(@PathParam("id") Long pollId, @NotNull Vote vote){
+        return pollService.vote(pollId, vote);
     }
 
 }

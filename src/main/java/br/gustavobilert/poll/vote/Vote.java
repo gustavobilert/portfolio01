@@ -6,6 +6,8 @@ import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import br.gustavobilert.poll.Poll;
 
 import javax.persistence.*;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 
 @Entity
@@ -24,6 +26,7 @@ public class Vote {
     /**
      * CPF (brazilian registration of individuals) of the voter.
      */
+    @NotBlank(message = "CPF is required")
     private String cpf;
 
     /**

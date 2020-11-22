@@ -6,52 +6,26 @@
 	},
 	"item": [
 		{
-			"name": "Create a poll",
-			"event": [
-				{
-					"listen": "test",
-					"script": {
-						"id": "3f4343fb-5e3b-4f0a-ac40-8b6d7374d15b",
-						"exec": [
-							"pm.test(\"Id is not null\", function () {\r",
-							"    var jsonData = pm.response.json();\r",
-							"    pm.expect(jsonData.id).to.not.be.null;\r",
-							"    pm.globals.set(\"poll_id\", jsonData.id);\r",
-							"});\r",
-							"\r",
-							""
-						],
-						"type": "text/javascript"
-					}
-				}
-			],
+			"name": "Check poll was created",
 			"request": {
-				"method": "POST",
+				"method": "GET",
 				"header": [],
-				"body": {
-					"mode": "raw",
-					"raw": "{\r\n    \"description\": \"Gostaria de aprovar o candidato Gustavo Bilert para fazer parte de sua equipe?\"\r\n}",
-					"options": {
-						"raw": {
-							"language": "json"
-						}
-					}
-				},
 				"url": {
-					"raw": "localhost:8080/polls",
+					"raw": "localhost:8080/polls/{{poll_id}}",
 					"host": [
 						"localhost"
 					],
 					"port": "8080",
 					"path": [
-						"polls"
+						"polls",
+						"{{poll_id}}"
 					]
 				}
 			},
 			"response": []
 		},
 		{
-			"name": "Check poll was created",
+			"name": "Get poll result",
 			"request": {
 				"method": "GET",
 				"header": [],
@@ -88,6 +62,51 @@
 			"request": {
 				"method": "GET",
 				"header": [],
+				"url": {
+					"raw": "localhost:8080/polls",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"polls"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Create a poll",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "3f4343fb-5e3b-4f0a-ac40-8b6d7374d15b",
+						"exec": [
+							"pm.test(\"Id is not null\", function () {\r",
+							"    var jsonData = pm.response.json();\r",
+							"    pm.expect(jsonData.id).to.not.be.null;\r",
+							"    pm.globals.set(\"poll_id\", jsonData.id);\r",
+							"});\r",
+							"\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"description\": \"Gostaria de aprovar o candidato Gustavo Bilert para fazer parte de sua equipe?\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
 				"url": {
 					"raw": "localhost:8080/polls",
 					"host": [
@@ -165,7 +184,7 @@
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\r\n    \"externalVoterIdentifier\": \"external-{{cpf}}\",\r\n    \"vote\": true\r\n}",
+					"raw": "{\r\n    \"cpf\": {{cpf}},\r\n    \"externalVoterIdentifier\": \"external-{{cpf}}\",\r\n    \"vote\": true\r\n}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -173,7 +192,7 @@
 					}
 				},
 				"url": {
-					"raw": "localhost:8080/polls/{{poll_id}}/vote-by-cpf/{{cpf}}",
+					"raw": "localhost:8080/polls/{{poll_id}}/vote",
 					"host": [
 						"localhost"
 					],
@@ -181,8 +200,7 @@
 					"path": [
 						"polls",
 						"{{poll_id}}",
-						"vote-by-cpf",
-						"{{cpf}}"
+						"vote"
 					]
 				}
 			},
@@ -241,25 +259,6 @@
 						"{{poll_id}}",
 						"vote-by-cpf",
 						"{{cpf}}"
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "Get poll result",
-			"request": {
-				"method": "GET",
-				"header": [],
-				"url": {
-					"raw": "localhost:8080/polls/{{poll_id}}",
-					"host": [
-						"localhost"
-					],
-					"port": "8080",
-					"path": [
-						"polls",
-						"{{poll_id}}"
 					]
 				}
 			},

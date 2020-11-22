@@ -18,9 +18,4 @@ public class VoterSituation {
     public VoterStatus getStatus() {
         return status;
     }
-
-    public void setStatus(VoterStatus status) {
-        this.status = status;
-    }
-
 }

@@ -33,6 +33,9 @@ public class VoteValidator {
 
     private VoterSituation getVoterSituationFromExternalService(String cpf) {
         try {
+            // This call is impacting performance, without it the response time is around 10ms,
+            // with it the time goes over 150ms. On a real systems we would add a cache
+            // and may be batch processing of registered voters
             return voterSituationService.getByCpf(cpf);
         } catch (NotFoundException e) {
             throw new ResourceNotFoundException("CPF: " + cpf);

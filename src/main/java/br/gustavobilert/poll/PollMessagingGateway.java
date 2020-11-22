@@ -2,6 +2,7 @@ package br.gustavobilert.poll;
 
 import br.gustavobilert.poll.event.PollResultComputed;
 import io.vertx.core.json.JsonObject;
+import org.eclipse.microprofile.config.inject.ConfigProperty;
 import org.eclipse.microprofile.reactive.messaging.Channel;
 import org.eclipse.microprofile.reactive.messaging.Emitter;
 import org.eclipse.microprofile.reactive.messaging.Incoming;
@@ -17,6 +18,10 @@ public class PollMessagingGateway {
     @Inject
     @Channel("poll-create")
     Emitter<Poll> pollEmitter;
+
+    @ConfigProperty(name = "mp.messaging.outgoing.poll-create.enabled", defaultValue = "false")
+    Boolean publishingEnabled;
+
 
     private static final Logger LOG = Logger.getLogger(PollMessagingGateway.class);
 
@@ -34,7 +39,9 @@ public class PollMessagingGateway {
      */
     public void publishPoll(Poll poll) {
         try {
-            pollEmitter.send(poll);
+            if(publishingEnabled){
+                pollEmitter.send(poll);
+            }
         } catch (IllegalStateException e) {
             LOG.warn("MESSAGING NOT FOUND: ActiveMQ Artemis must be running in order to publish messages to the queue. " +
                     "You may run it by executing 'docker-compose up' in the 'docker' directory. " +
@@ -44,9 +51,8 @@ public class PollMessagingGateway {
 
     @Incoming("polls")
     public void pollReceived(JsonObject poll){
-        // Should be trace, but we are using info for demonstrative purposes
-        LOG.info("MESSAGING: Poll received");
-        LOG.info("MESSAGING: " + poll);
+        // Just log the message for demonstration of the feature
+        LOG.info("MESSAGING: Poll received\n" + poll);
     }
 
 }

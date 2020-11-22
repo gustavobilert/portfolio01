@@ -186,7 +186,7 @@ public class PollServiceUnitTest implements WithMockito, WithAdditionalMatchers 
         vote.setVote(false);
         String externalVoterIdentifier = "cpf-" + cpf;
         vote.setExternalVoterIdentifier(externalVoterIdentifier);
-        Vote registeredVote = pollService.voteByCpf(generatedId, vote);
+        Vote registeredVote = pollService.vote(generatedId, vote);
 
         assertThat(registeredVote).isNotNull();
         assertThat(registeredVote.getCpf()).isEqualTo(cpf);
@@ -208,7 +208,7 @@ public class PollServiceUnitTest implements WithMockito, WithAdditionalMatchers 
         Vote vote = new Vote();
         vote.setCpf(cpf);
         vote.setVote(false);
-        assertThatThrownBy(() -> pollService.voteByCpf(generatedId, vote))
+        assertThatThrownBy(() -> pollService.vote(generatedId, vote))
                 .isExactlyInstanceOf(ResourceNotFoundException.class);
     }
 
@@ -224,7 +224,7 @@ public class PollServiceUnitTest implements WithMockito, WithAdditionalMatchers 
         Vote vote = new Vote();
         vote.setCpf(cpf);
         vote.setVote(false);
-        assertThatThrownBy(() -> pollService.voteByCpf(generatedId, vote))
+        assertThatThrownBy(() -> pollService.vote(generatedId, vote))
                 .isExactlyInstanceOf(VoterNotAllowedException.class);
     }
 
@@ -243,7 +243,7 @@ public class PollServiceUnitTest implements WithMockito, WithAdditionalMatchers 
         Vote vote = new Vote();
         vote.setCpf(cpf);
         vote.setVote(false);
-        assertThatThrownBy(() -> pollService.voteByCpf(generatedId, vote))
+        assertThatThrownBy(() -> pollService.vote(generatedId, vote))
                 .isExactlyInstanceOf(CpfAlreadyVotedException.class);
     }
 
@@ -259,7 +259,7 @@ public class PollServiceUnitTest implements WithMockito, WithAdditionalMatchers 
         Vote vote = new Vote();
         vote.setCpf(cpf);
         vote.setVote(false);
-        assertThatThrownBy(() -> pollService.voteByCpf(-1000L, vote))
+        assertThatThrownBy(() -> pollService.vote(-1000L, vote))
                 .isExactlyInstanceOf(ResourceNotFoundException.class);
     }
 

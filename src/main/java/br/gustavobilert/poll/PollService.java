@@ -83,11 +83,11 @@ public class PollService {
 
     /**
      * Places a vote on the poll. The voter is identified by his/her CPF (brazilian registration of individuals).
-     *  @param pollId Id of the poll
+     * @param pollId Id of the poll
      * @return The registered vote
      */
     @Transactional
-    public Vote voteByCpf(@NotNull Long pollId, @NotNull @Valid Vote vote){
+    public Vote vote(@NotNull Long pollId, @NotNull @Valid Vote vote){
         Poll poll = pollRepository.getById(pollId);
         vote.setPoll(poll);
         voteValidator.validate(vote);

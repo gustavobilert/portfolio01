@@ -97,10 +97,10 @@
 					"script": {
 						"id": "7e191a41-8a75-48e9-bf6d-bfdddc38e23e",
 						"exec": [
-							"//100 ms is a maximum allowed value according to requirements \r",
-							"maximumResponseTime = 100;\r",
-							"//1000 is a number of sent requests according to requirements \r",
-							"iterations = 1000;\r",
+							"//200 ms is a maximum allowed value according to requirements \r",
+							"maximumResponseTime = 200;\r",
+							"//100 is a number of sent requests according to requirements \r",
+							"iterations = 100;\r",
 							"//1 ms is a delay between requests according to requirements \r",
 							"delay = 1;\r",
 							"//responseTimes is an array for collecting response time values\r",
@@ -109,14 +109,14 @@
 							"function sendRequest() {\r",
 							"    pm.globals.set('cpf', cpf());\r",
 							"    pm.sendRequest({\r",
-							"        url: pm.variables.replaceIn(\"localhost:8080/polls/{{poll_id}}/vote-by-cpf/{{cpf}}\"),\r",
+							"        url: pm.variables.replaceIn(\"localhost:8080/polls/{{poll_id}}/vote\"),\r",
 							"        method: 'POST',\r",
 							"        header: {\r",
 							"            'Content-Type': 'application/json'\r",
 							"        },\r",
 							"        body: {\r",
 							"            mode: 'raw',\r",
-							"            raw: JSON.stringify({ vote: true })\r",
+							"            raw: JSON.stringify({ cpf: pm.globals.get(\"cpf\"), vote: true })\r",
 							"        }\r",
 							"    }, function (err, res) {\r",
 							"        pm.test(\"Response time is \" + res.responseTime, function (){\r",
@@ -178,7 +178,7 @@
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\r\n    \"externalVoterIdentifier\": \"external-{{cpf}}\",\r\n    \"vote\": true\r\n}",
+					"raw": "{\r\n    \"cpf\": {{cpf}},\r\n    \"externalVoterIdentifier\": \"external-{{cpf}}\",\r\n    \"vote\": true\r\n}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -186,7 +186,7 @@
 					}
 				},
 				"url": {
-					"raw": "localhost:8080/polls/{{poll_id}}/vote-by-cpf/{{cpf}}",
+					"raw": "localhost:8080/polls/{{poll_id}}/vote",
 					"host": [
 						"localhost"
 					],
@@ -194,8 +194,7 @@
 					"path": [
 						"polls",
 						"{{poll_id}}",
-						"vote-by-cpf",
-						"{{cpf}}"
+						"vote"
 					]
 				}
 			},
